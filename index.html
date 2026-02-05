@@ -4,57 +4,27 @@
 <meta charset="UTF-8">
 <title>Manutenção de Ar-Condicionado</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f1f4f7;
-  padding: 20px;
-  text-align: center;
-}
-.card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-  margin: auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,.1);
-}
-input, select, textarea, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-}
-button {
-  background: #1e88e5;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.hidden { display: none; }
-.logout { background: #c62828; margin-top: 15px; }
-.list {
-  text-align: left;
-  margin-top: 15px;
-  background: #f7f9fb;
-  padding: 10px;
-  border-radius: 8px;
-}
-hr { margin: 20px 0; }
+body { font-family: Arial, sans-serif; background: #f1f4f7; padding:20px; text-align:center; }
+.card { background:#fff; padding:20px; border-radius:12px; max-width:500px; margin:auto; box-shadow:0 4px 10px rgba(0,0,0,.1); }
+input, select, textarea, button { width:100%; padding:10px; margin-top:8px; }
+button { background:#1e88e5; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+.hidden { display:none; }
+.logout { background:#c62828; margin-top:15px; }
+.list { text-align:left; margin-top:15px; background:#f7f9fb; padding:10px; border-radius:8px; }
+hr { margin:20px 0; }
 </style>
 </head>
-
 <body>
 
+<!-- HOME -->
 <div class="card" id="home">
   <h2>📋 Manutenção de Ar-Condicionado</h2>
   <button onclick="abrirCliente()">👤 Área do Cliente</button>
-  <function loginTecnico() {
-  alert("Botão funcionando");
-}
+  <button onclick="abrirLoginTecnico()">🔧 Área do Técnico</button>
+</div>
 
-<!-- CLIENTE (SEM SENHA) -->
+<!-- CLIENTE -->
 <div class="card hidden" id="cliente">
   <h3>👤 Área do Cliente</h3>
   <div id="listaCliente"></div>
@@ -65,14 +35,11 @@ hr { margin: 20px 0; }
 <div class="card hidden" id="loginTecnico">
   <h3>🔐 Login Técnico</h3>
   <input id="senhaTecnico" type="password" placeholder="Senha do técnico">
-  <function loginTecnico() {
-  alert("Botão funcionando");
-}
-
+  <button onclick="loginTecnico()">Entrar</button>
   <button class="logout" onclick="voltar()">Voltar</button>
 </div>
 
-<!-- AREA TECNICO -->
+<!-- ÁREA TECNICO -->
 <div class="card hidden" id="tecnico">
   <h3>🔧 Área do Técnico</h3>
 
@@ -85,17 +52,4 @@ hr { margin: 20px 0; }
 
   <h4>🛠 Registrar Manutenção</h4>
   <select id="aparelhoSelect"></select>
-  <textarea id="descricaoManutencao" placeholder="Descrição da manutenção"></textarea>
-  <button onclick="addManutencao()">Salvar Manutenção</button>
-
-  <hr>
-
-  <h4>📄 Histórico</h4>
-  <div id="listaTecnico"></div>
-
-  <button class="logout" onclick="logout()">Sair</button>
-</div>
-
-<script>
-const SENHA_TECNICO = "211710";
-let dados =
+  <textarea id="descricaoManutenca
