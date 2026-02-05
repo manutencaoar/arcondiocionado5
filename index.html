@@ -6,18 +6,21 @@
 <style>
 body{font-family:Arial;padding:20px;}
 .hidden{display:none;}
-input,button{display:block;margin:10px 0;padding:8px;width:100%;}
+input,button,textarea{display:block;margin:10px 0;padding:8px;width:100%;}
 div.aparelho{border:1px solid #ccc;padding:10px;margin:10px 0;}
+textarea{resize:none;}
 </style>
 </head>
 <body>
 
+<!-- LOGIN TÉCNICO -->
 <div id="loginDiv">
 <h2>Login Técnico</h2>
 <input type="password" id="senha" placeholder="Senha">
 <button onclick="login()">Entrar</button>
 </div>
 
+<!-- PAINEL TÉCNICO -->
 <div id="adminDiv" class="hidden">
 <h2>Painel Técnico</h2>
 <input id="cliente" placeholder="Nome do Cliente">
@@ -30,90 +33,20 @@ div.aparelho{border:1px solid #ccc;padding:10px;margin:10px 0;}
 <button onclick="logout()">Sair</button>
 </div>
 
+<!-- ÁREA DO CLIENTE -->
 <div id="clienteDiv" class="hidden">
 <h2>Histórico do Aparelho</h2>
 <div id="hist"></div>
+
+<h3>Adicionar Manutenção</h3>
+<textarea id="descManut" placeholder="Descrição da manutenção"></textarea>
+<button onclick="clienteAddManut()">Registrar Manutenção</button>
 </div>
 
 <script>
 const senhaCorreta = "1234";
 
-// Login
+// LOGIN
 function login(){
   const s = document.getElementById("senha").value;
-  if(s===senhaCorreta){
-    document.getElementById("loginDiv").classList.add("hidden");
-    document.getElementById("adminDiv").classList.remove("hidden");
-    listarAparelhos();
-  } else alert("Senha incorreta");
-}
-function logout(){ location.reload(); }
-
-// Adicionar Aparelho
-function addAparelho(){
-  const cliente = document.getElementById("cliente").value.trim();
-  const aparelho = document.getElementById("aparelho").value.trim();
-  if(!cliente || !aparelho){ alert("Preencha todos os campos"); return; }
-  const id = "ap"+Date.now();
-  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
-  aparelhos.push({id,cliente,aparelho,manutencoes:[]});
-  localStorage.setItem("aparelhos",JSON.stringify(aparelhos));
-  document.getElementById("cliente").value="";
-  document.getElementById("aparelho").value="";
-  listarAparelhos();
-}
-
-// Listar Aparelhos
-function listarAparelhos(){
-  const lista = document.getElementById("lista");
-  lista.innerHTML="";
-  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
-  if(aparelhos.length===0){ lista.innerHTML="Nenhum aparelho cadastrado."; return; }
-  aparelhos.forEach(a=>{
-    const div = document.createElement("div");
-    div.className = "aparelho";
-    div.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<br>
-    <button onclick="adicionarManut('${a.id}')">Adicionar Manutenção</button>
-    <button onclick="gerarQR('${a.id}')">Ver Cliente</button>`;
-    lista.appendChild(div);
-  });
-}
-
-// Adicionar Manutenção
-function adicionarManut(id){
-  const desc = prompt("Descrição da manutenção:");
-  if(!desc) return;
-  const aparelhos = JSON.parse(localStorage.getItem("aparelhos"));
-  const aparelho = aparelhos.find(a=>a.id===id);
-  aparelho.manutencoes.push({data:new Date().toLocaleDateString(),desc});
-  localStorage.setItem("aparelhos",JSON.stringify(aparelhos));
-  listarAparelhos();
-}
-
-// Gerar QR / link para cliente
-function gerarQR(id){
-  alert("Link para cliente: "+location.origin+location.pathname+"?id="+id);
-}
-
-// Cliente (abrir página com ?id=)
-window.onload = function(){
-  const params = new URLSearchParams(location.search);
-  const id = params.get("id");
-  if(id){
-    document.getElementById("loginDiv").classList.add("hidden");
-    document.getElementById("adminDiv").classList.add("hidden");
-    document.getElementById("clienteDiv").classList.remove("hidden");
-    const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
-    const a = aparelhos.find(x=>x.id===id);
-    if(!a){ document.getElementById("hist").innerText="Aparelho não encontrado."; return; }
-    const hist = document.getElementById("hist");
-    hist.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<hr>`;
-    if(a.manutencoes.length===0){ hist.innerHTML+="Nenhuma manutenção registrada."; return; }
-    a.manutencoes.forEach(m=>{
-      hist.innerHTML+=`📅 ${m.data}: ${m.desc}<br>`;
-    });
-  }
-}
-</script>
-</body>
-</html>
+  if(s===
