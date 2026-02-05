@@ -50,8 +50,9 @@ hr { margin: 20px 0; }
 <div class="card" id="home">
   <h2>📋 Manutenção de Ar-Condicionado</h2>
   <button onclick="abrirCliente()">👤 Área do Cliente</button>
-  <button onclick="abrirLoginTecnico()">🔧 Área do Técnico</button>
-</div>
+  <function loginTecnico() {
+  alert("Botão funcionando");
+}
 
 <!-- CLIENTE (SEM SENHA) -->
 <div class="card hidden" id="cliente">
@@ -64,7 +65,10 @@ hr { margin: 20px 0; }
 <div class="card hidden" id="loginTecnico">
   <h3>🔐 Login Técnico</h3>
   <input id="senhaTecnico" type="password" placeholder="Senha do técnico">
-  <button onclick="loginTecnico()">Entrar</button>
+  <function loginTecnico() {
+  alert("Botão funcionando");
+}
+
   <button class="logout" onclick="voltar()">Voltar</button>
 </div>
 
