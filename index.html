@@ -25,11 +25,10 @@ textarea { resize: none; }
   <h2>Painel Técnico</h2>
   <input id="cliente" placeholder="Nome do Cliente">
   <input id="aparelho" placeholder="Descrição do Aparelho">
-  <input id="data da manutencao" placeholder="Descrição do servico">
   <button onclick="addAparelho()">Adicionar Aparelho</button>
 
   <h3>Lista de Aparelhos</h3>
-  <div id="lista"></div>
+  <div id="lista">Nenhum aparelho cadastrado.</div>
 
   <button onclick="logout()">Sair</button>
 </div>
@@ -47,7 +46,7 @@ textarea { resize: none; }
 <script>
 const senhaCorreta = "1234";
 
-// LOGIN
+// LOGIN TÉCNICO
 function login() {
   const s = document.getElementById("senha").value;
   if(s === senhaCorreta){
@@ -57,9 +56,90 @@ function login() {
   } else alert("Senha incorreta");
 }
 
-function logout() {
-  location.reload();
-}
+// LOGOUT
+function logout() { location.reload(); }
 
 // ADICIONAR APARELHO
-function addAparelho(
+function addAparelho() {
+  const cliente = document.getElementById("cliente").value.trim();
+  const aparelho = document.getElementById("aparelho").value.trim();
+  if(!cliente || !aparelho){ alert("Preencha todos os campos"); return; }
+  const id = "ap" + Date.now();
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  aparelhos.push({id, cliente, aparelho, manutencoes: []});
+  localStorage.setItem("aparelhos", JSON.stringify(aparelhos));
+  document.getElementById("cliente").value = "";
+  document.getElementById("aparelho").value = "";
+  listarAparelhos();
+}
+
+// LISTAR APARELHOS
+function listarAparelhos() {
+  const lista = document.getElementById("lista");
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  if(aparelhos.length === 0) { lista.innerHTML = "Nenhum aparelho cadastrado."; return; }
+  lista.innerHTML = "";
+  aparelhos.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "aparelho";
+    div.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<br>
+      <button onclick="adicionarManut('${a.id}')">Adicionar Manutenção</button>
+      <button onclick="verCliente('${a.id}')">Ver Área do Cliente</button>`;
+    lista.appendChild(div);
+  });
+}
+
+// ADICIONAR MANUTENÇÃO (TÉCNICO)
+function adicionarManut(id) {
+  const desc = prompt("Descrição da manutenção:");
+  if(!desc) return;
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos"));
+  const aparelho = aparelhos.find(a => a.id === id);
+  aparelho.manutencoes.push({data: new Date().toLocaleDateString(), desc});
+  localStorage.setItem("aparelhos", JSON.stringify(aparelhos));
+  listarAparelhos();
+}
+
+// ABRIR ÁREA DO CLIENTE
+function verCliente(id) {
+  document.getElementById("adminDiv").classList.add("hidden");
+  document.getElementById("clienteDiv").classList.remove("hidden");
+  mostrarHistoricoCliente(id);
+}
+
+// CLIENTE ADICIONA MANUTENÇÃO
+function clienteAddManut() {
+  const desc = document.getElementById("descManut").value.trim();
+  if(!desc){ alert("Digite a descrição da manutenção"); return; }
+  const id = document.getElementById("clienteDiv").dataset.id;
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  const aparelho = aparelhos.find(a => a.id === id);
+  if(!aparelho){ alert("Aparelho não encontrado"); return; }
+  aparelho.manutencoes.push({data: new Date().toLocaleDateString(), desc});
+  localStorage.setItem("aparelhos", JSON.stringify(aparelhos));
+  document.getElementById("descManut").value = "";
+  mostrarHistoricoCliente(id);
+}
+
+// MOSTRAR HISTÓRICO CLIENTE
+function mostrarHistoricoCliente(id) {
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  const a = aparelhos.find(x => x.id === id);
+  if(!a) { document.getElementById("hist").innerText = "Aparelho não encontrado."; return; }
+  document.getElementById("clienteDiv").dataset.id = id;
+  const hist = document.getElementById("hist");
+  hist.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<hr>`;
+  if(a.manutencoes.length === 0) { hist.innerHTML += "Nenhuma manutenção registrada."; return; }
+  a.manutencoes.forEach(m => {
+    hist.innerHTML += `📅 ${m.data}: ${m.desc}<br>`;
+  });
+}
+
+// CARREGAR ÁREA DO CLIENTE VIA URL
+window.onload = function() {
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  if(id){
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.add("hidden");
+    doc
