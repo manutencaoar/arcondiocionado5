@@ -4,49 +4,62 @@
 <meta charset="UTF-8">
 <title>Manutenção Ar-Condicionado</title>
 <style>
-body{font-family:Arial;padding:20px;}
-.hidden{display:none;}
-input,button,textarea{display:block;margin:10px 0;padding:8px;width:100%;}
-div.aparelho{border:1px solid #ccc;padding:10px;margin:10px 0;}
-textarea{resize:none;}
+body { font-family: Arial; padding: 20px; }
+.hidden { display: none; }
+input, button, textarea { display: block; margin: 10px 0; padding: 8px; width: 100%; }
+div.aparelho { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+textarea { resize: none; }
 </style>
 </head>
 <body>
 
 <!-- LOGIN TÉCNICO -->
 <div id="loginDiv">
-<h2>Login Técnico</h2>
-<input type="password" id="senha" placeholder="Senha">
-<button onclick="login()">Entrar</button>
+  <h2>Login Técnico</h2>
+  <input type="password" id="senha" placeholder="Senha">
+  <button onclick="login()">Entrar</button>
 </div>
 
 <!-- PAINEL TÉCNICO -->
 <div id="adminDiv" class="hidden">
-<h2>Painel Técnico</h2>
-<input id="cliente" placeholder="Nome do Cliente">
-<input id="aparelho" placeholder="Descrição do Aparelho">
-<button onclick="addAparelho()">Adicionar Aparelho</button>
+  <h2>Painel Técnico</h2>
+  <input id="cliente" placeholder="Nome do Cliente">
+  <input id="aparelho" placeholder="Descrição do Aparelho">
+  <input id="data da manutencao" placeholder="Descrição do servico">
+  <button onclick="addAparelho()">Adicionar Aparelho</button>
 
-<h3>Lista de Aparelhos</h3>
-<div id="lista"></div>
+  <h3>Lista de Aparelhos</h3>
+  <div id="lista"></div>
 
-<button onclick="logout()">Sair</button>
+  <button onclick="logout()">Sair</button>
 </div>
 
 <!-- ÁREA DO CLIENTE -->
 <div id="clienteDiv" class="hidden">
-<h2>Histórico do Aparelho</h2>
-<div id="hist"></div>
+  <h2>Histórico do Aparelho</h2>
+  <div id="hist"></div>
 
-<h3>Adicionar Manutenção</h3>
-<textarea id="descManut" placeholder="Descrição da manutenção"></textarea>
-<button onclick="clienteAddManut()">Registrar Manutenção</button>
+  <h3>Adicionar Manutenção</h3>
+  <textarea id="descManut" placeholder="Descrição da manutenção"></textarea>
+  <button onclick="clienteAddManut()">Registrar Manutenção</button>
 </div>
 
 <script>
 const senhaCorreta = "1234";
 
 // LOGIN
-function login(){
+function login() {
   const s = document.getElementById("senha").value;
-  if(s===
+  if(s === senhaCorreta){
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.remove("hidden");
+    listarAparelhos();
+  } else alert("Senha incorreta");
+}
+
+function logout() {
+  location.reload();
+}
+
+// ADICIONAR APARELHO
+function addAparelho(
