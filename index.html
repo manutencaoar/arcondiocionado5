@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Manutenção de Ar-Condicionado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 420px;
+      margin: auto;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: #555;
+      font-size: 14px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #1e88e5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .tecnico-btn {
+      background: #43a047;
+    }
+
+    .logout {
+      background: #c62828;
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="card" id="login">
+  <h1>📋 Manutenção do Ar</h1>
+  <p>Área do cliente e técnico</p>
+
+  <select id="tipo">
+    <option value="cliente">Cliente</option>
+    <option value="tecnico">Técnico</option>
+  </select>
+
+  <input type="text" id="usuario" placeholder="Usuário">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button onclick="entrar()">Entrar</button>
+</div>
+
+<!-- ÁREA DO CLIENTE -->
+<div class="card hidden" id="cliente">
+  <h1>👤 Área do Cliente</h1>
+
+  <p><strong>Equipamento:</strong> Split 12.000 BTUs</p>
+  <p><strong>Última manutenção:</strong> 15/01/2026</p>
+  <p><strong>Próxima manutenção:</strong> 15/07/2026</p>
+  <p><strong>Status:</strong> Em funcionamento normal</p>
+
+  <footer>
+    Empresa: Manutencao de ar <br>
+    Contato: (00) 00000-0000
+  </footer>
+
+  <button class="logout" onclick="sair()">Sair</button>
+</div>
+
+<!-- ÁREA DO TÉCNICO -->
+<div class="card hidden" id="tecnico">
+  <h1>🔧 Área do Técnico</h1>
+
+  <p>Registrar nova manutenção:</p>
+
+  <button class="tecnico-btn"
+    onclick="window.open('LINK_DO_GOOGLE_FORMS','_blank')">
+    Abrir formulário
+  </button>
+
+  <br><br>
+
+  <button
+    onclick="window.open('LINK_DA_PLANILHA_HISTORICO','
