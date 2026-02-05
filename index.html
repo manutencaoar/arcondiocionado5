@@ -3,221 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Manutenção Ar-Condicionado</title>
+    <title>SGM - Sistema de Gestão de Manutenção</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
+            --primary: #0284c7;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg: #f1f5f9;
             --card: #ffffff;
             --text: #1e293b;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
-        .container { max-width: 600px; margin: 0 auto; background: var(--card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
         
-        .hidden { display: none; }
-        
-        h2 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-        
-        input, button, textarea { 
-            display: block; width: 100%; margin: 10px 0; padding: 12px; 
-            border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
-        }
+        /* Navegação */
+        nav { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        nav button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-nav { background: var(--secondary); color: white; }
+        .btn-nav.active { background: var(--primary); }
 
-        button { 
-            background-color: var(--primary); color: white; border: none; 
-            cursor: pointer; font-weight: 600; transition: opacity 0.2s; 
-        }
-        
-        button:hover { opacity: 0.9; }
-        button.secondary { background-color: #64748b; margin-top: 20px; }
+        /* Painéis */
+        .panel { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
+        .panel.active { display: block; }
 
-        .aparelho-card { 
-            border-left: 5px solid var(--primary); background: #f1f5f9; 
-            padding: 15px; margin: 15px 0; border-radius: 4px; 
-        }
+        /* Formulários */
+        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .full-width { grid-column: span 2; }
+        button.main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-weight: bold; }
 
-        .manutencao-item { font-size: 0.9rem; padding: 5px 0; border-bottom: 1px dashed #cbd5e1; }
+        /* Lista de Equipamentos */
+        .card-equip { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
+        .card-equip h4 { margin: 0 0 10px 0; color: var(--primary); }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #e0f2fe; color: var(--primary); }
         
-        .btn-group { display: flex; gap: 10px; }
-        .btn-group button { padding: 8px; font-size: 0.8rem; }
+        .history-item { font-size: 14px; border-left: 3px solid var(--primary); padding-left: 10px; margin-top: 10px; }
+        
+        .search-box { margin-bottom: 20px; padding: 10px; font-size: 16px; border: 2px solid var(--primary); }
+
+        @media (max-width: 600px) { .grid-form { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="loginDiv">
-        <h2>Login Técnico</h2>
-        <input type="password" id="senha" placeholder="Digite a senha (1234)">
-        <button onclick="login()">Acessar Painel</button>
-    </div>
+    <nav>
+        <button class="btn-nav active" onclick="switchPanel('tecnico')">Área do Técnico</button>
+        <button class="btn-nav" onclick="switchPanel('cliente')">Área do Cliente</button>
+    </nav>
 
-    <div id="adminDiv" class="hidden">
-        <h2>Painel de Controle</h2>
-        <input id="cliente" placeholder="Nome do Cliente">
-        <input id="aparelho" placeholder="Modelo do Ar-Condicionado">
-        <button onclick="addAparelho()">Cadastrar Novo Aparelho</button>
-
-        <h3>Aparelhos Cadastrados</h3>
-        <div id="lista">Carregando...</div>
-
-        <button class="secondary" onclick="logout()">Sair do Sistema</button>
-    </div>
-
-    <div id="clienteDiv" class="hidden">
-        <h2>Histórico de Manutenções</h2>
-        <div id="histHeader"></div>
-        <div id="histLista"></div>
-
-        <h3 style="margin-top:20px">Registrar Nova Atividade</h3>
-        <textarea id="descManut" rows="3" placeholder="O que foi feito no aparelho?"></textarea>
-        <button onclick="clienteAddManut()">Salvar Registro</button>
+    <div id="tecnico" class="panel active">
+        <h2>Painel Administrativo</h2>
         
-        <button class="secondary" onclick="voltarAdmin()">← Voltar ao Painel</button>
+        <div class="grid-form">
+            <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+            <input type="text" id="modelo" placeholder="Modelo do Aparelho (Ex: LG Dual Inverter)">
+            <input type="text" id="btus" placeholder="Capacidade (BTUs)">
+            <input type="date" id="dataInstalacao">
+            <button class="main full-width" onclick="cadastrarEquipamento()">Cadastrar Equipamento</button>
+        </div>
+
+        <hr>
+        <h3>Equipamentos Cadastrados</h3>
+        <div id="listaTecnico"></div>
+    </div>
+
+    <div id="cliente" class="panel">
+        <h2>Consulta de Manutenções</h2>
+        <input type="text" id="buscaCliente" class="search-box" placeholder="Digite seu nome para buscar..." onkeyup="buscarCliente()">
+        
+        <div id="resultadoBusca">
+            <p style="text-align: center; color: #64748b;">Digite seu nome acima para ver seus aparelhos.</p>
+        </div>
     </div>
 </div>
 
 <script>
-    const SENHA_MESTRA = "1234";
+    // Inicialização de dados
+    let db = JSON.parse(localStorage.getItem('sgm_dados')) || [];
 
-    // --- LÓGICA DE LOGIN ---
-    function login() {
-        const s = document.getElementById("senha").value;
-        if(s === SENHA_MESTRA){
-            document.getElementById("loginDiv").classList.add("hidden");
-            document.getElementById("adminDiv").classList.remove("hidden");
-            listarAparelhos();
-        } else {
-            alert("Senha incorreta!");
+    function switchPanel(panelId) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(panelId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        if(panelId === 'tecnico') listarTecnico();
+    }
+
+    function cadastrarEquipamento() {
+        const cliente = document.getElementById('nomeCliente').value;
+        const modelo = document.getElementById('modelo').value;
+        const btus = document.getElementById('btus').value;
+        const data = document.getElementById('dataInstalacao').value;
+
+        if(!cliente || !modelo) return alert("Preencha ao menos Nome e Modelo!");
+
+        const novo = {
+            id: Date.now(),
+            cliente: cliente,
+            modelo: modelo,
+            btus: btus,
+            data: data,
+            historico: []
+        };
+
+        db.push(novo);
+        salvar();
+        listarTecnico();
+        
+        // Limpar campos
+        document.querySelectorAll('#tecnico input').forEach(i => i.value = '');
+    }
+
+    function adicionarManutencao(id) {
+        const desc = prompt("Descrição da manutenção realizada:");
+        if(!desc) return;
+
+        const index = db.findIndex(item => item.id === id);
+        const registro = {
+            data: new Date().toLocaleDateString('pt-BR'),
+            servico: desc
+        };
+
+        db[index].historico.unshift(registro); // Adiciona no topo
+        salvar();
+        listarTecnico();
+    }
+
+    function excluirEquipamento(id) {
+        if(confirm("Deseja remover este equipamento?")) {
+            db = db.filter(item => item.id !== id);
+            salvar();
+            listarTecnico();
         }
     }
 
-    function logout() { location.reload(); }
-
-    function voltarAdmin() {
-        document.getElementById("clienteDiv").classList.add("hidden");
-        document.getElementById("adminDiv").classList.remove("hidden");
-        listarAparelhos();
+    function salvar() {
+        localStorage.setItem('sgm_dados', JSON.stringify(db));
     }
 
-    // --- GESTÃO DE DADOS ---
-    function getDados() {
-        return JSON.parse(localStorage.getItem("aparelhos") || "[]");
-    }
+    function listarTecnico() {
+        const lista = document.getElementById('listaTecnico');
+        lista.innerHTML = '';
 
-    function salvarDados(dados) {
-        localStorage.setItem("aparelhos", JSON.stringify(dados));
-    }
-
-    // --- FUNÇÕES TÉCNICAS ---
-    function addAparelho() {
-        const cliente = document.getElementById("cliente").value.trim();
-        const aparelho = document.getElementById("aparelho").value.trim();
-        
-        if(!cliente || !aparelho) return alert("Preencha todos os campos!");
-
-        const novosDados = getDados();
-        novosDados.push({
-            id: "ID-" + Math.floor(Math.random() * 10000),
-            cliente,
-            aparelho,
-            manutencoes: []
+        db.forEach(item => {
+            lista.innerHTML += `
+                <div class="card-equip">
+                    <h4>${item.cliente}</h4>
+                    <span class="badge">${item.modelo} - ${item.btus} BTUs</span>
+                    <p><small>Instalado em: ${item.data || 'Não informada'}</small></p>
+                    <button onclick="adicionarManutencao(${item.id})">+ Adicionar Manutenção</button>
+                    <button onclick="excluirEquipamento(${item.id})" style="color:var(--danger); background:none; border:none; cursor:pointer">Excluir</button>
+                    <div id="hist-${item.id}">
+                        ${item.historico.map(h => `<div class="history-item"><strong>${h.data}</strong>: ${h.servico}</div>`).join('')}
+                    </div>
+                </div>
+            `;
         });
-
-        salvarDados(novosDados);
-        document.getElementById("cliente").value = "";
-        document.getElementById("aparelho").value = "";
-        listarAparelhos();
     }
 
-    function listarAparelhos() {
-        const lista = document.getElementById("lista");
-        const aparelhos = getDados();
+    function buscarCliente() {
+        const termo = document.getElementById('buscaCliente').value.toLowerCase();
+        const resultado = document.getElementById('resultadoBusca');
         
-        if(aparelhos.length === 0) {
-            lista.innerHTML = "<p>Nenhum registro encontrado.</p>";
+        if(termo.length < 2) {
+            resultado.innerHTML = '<p style="text-align: center; color: #64748b;">Digite ao menos 2 letras.</p>';
             return;
         }
 
-        lista.innerHTML = "";
-        aparelhos.forEach(a => {
-            const div = document.createElement("div");
-            div.className = "aparelho-card";
-            div.innerHTML = `
-                <strong>👤 Cliente:</strong> ${a.cliente}<br>
-                <strong>❄️ Aparelho:</strong> ${a.aparelho}
-                <div class="btn-group">
-                    <button onclick="verDetalhes('${a.id}')">Gerenciar / Ver Histórico</button>
-                    <button style="background:#dc2626" onclick="deletarAparelho('${a.id}')">Excluir</button>
+        const filtrados = db.filter(item => item.cliente.toLowerCase().includes(termo));
+        
+        if(filtrados.length === 0) {
+            resultado.innerHTML = '<p>Nenhum aparelho encontrado para este nome.</p>';
+            return;
+        }
+
+        resultado.innerHTML = filtrados.map(item => `
+            <div class="card-equip">
+                <h4>${item.modelo}</h4>
+                <p><strong>Capacidade:</strong> ${item.btus} BTUs</p>
+                <div class="history">
+                    <strong>Histórico de Manutenções:</strong>
+                    ${item.historico.length ? 
+                        item.historico.map(h => `<div class="history-item">📅 ${h.data} - ${h.servico}</div>`).join('') 
+                        : '<p>Nenhuma manutenção registrada ainda.</p>'}
                 </div>
-            `;
-            lista.appendChild(div);
-        });
+            </div>
+        `).join('');
     }
 
-    function deletarAparelho(id) {
-        if(confirm("Deseja excluir este registro permanentemente?")) {
-            const dados = getDados().filter(a => a.id !== id);
-            salvarDados(dados);
-            listarAparelhos();
-        }
-    }
-
-    // --- ÁREA DE DETALHES (CLIENTE/TÉCNICO) ---
-    function verDetalhes(id) {
-        document.getElementById("adminDiv").classList.add("hidden");
-        document.getElementById("clienteDiv").classList.remove("hidden");
-        document.getElementById("clienteDiv").dataset.id = id;
-        atualizarVisualizacaoHistorico(id);
-    }
-
-    function clienteAddManut() {
-        const desc = document.getElementById("descManut").value.trim();
-        const id = document.getElementById("clienteDiv").dataset.id;
-        
-        if(!desc) return alert("Descreva a manutenção realizada.");
-
-        const dados = getDados();
-        const index = dados.findIndex(a => a.id === id);
-        
-        if(index !== -1) {
-            dados[index].manutencoes.unshift({ // Adiciona no início da lista
-                data: new Date().toLocaleDateString('pt-BR'),
-                desc: desc
-            });
-            salvarDados(dados);
-            document.getElementById("descManut").value = "";
-            atualizarVisualizacaoHistorico(id);
-        }
-    }
-
-    function atualizarVisualizacaoHistorico(id) {
-        const aparelhos = getDados();
-        const a = aparelhos.find(x => x.id === id);
-        const header = document.getElementById("histHeader");
-        const lista = document.getElementById("histLista");
-
-        if(!a) return;
-
-        header.innerHTML = `<h3>${a.cliente} <small>(${a.aparelho})</small></h3>`;
-        
-        if(a.manutencoes.length === 0) {
-            lista.innerHTML = "<p>Sem histórico de manutenção.</p>";
-        } else {
-            lista.innerHTML = a.manutencoes.map(m => `
-                <div class="manutencao-item">
-                    <strong>📅 ${m.data}:</strong> ${m.desc}
-                </div>
-            `).join('');
-        }
-    }
-
-    // Inicialização por URL (ex: index.html?id=ID-123)
-    window.onload = function() {
-        const params = new URLSearchParams(location.search);
-        const id = params.get("id");
-        if(id) verDetalhes(id);
-    };
+    // Carregar lista ao abrir
+    listarTecnico();
 </script>
 
 </body>
