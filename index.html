@@ -2,210 +2,114 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Manutenção de Ar-Condicionado</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
+<title>Manutenção Ar-Condicionado</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f7f9fb;padding:20px;text-align:center;}
-.card{background:#fff;padding:20px;border-radius:8px;max-width:500px;margin:auto;box-shadow:0 4px 8px rgba(0,0,0,.1);}
-input,textarea,button,select{width:100%;padding:10px;margin-top:10px;font-size:16px;}
-button{background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+body{font-family:Arial;padding:20px;}
 .hidden{display:none;}
-.list{background:#eef2f7;padding:10px;margin-top:10px;border-radius:6px;text-align:left;}
-.logout{background:#d32f2f;margin-top:15px;}
+input,button{display:block;margin:10px 0;padding:8px;width:100%;}
 </style>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="card" id="loginCard">
-  <h2>🔧 Login Técnico</h2>
-  <input id="loginEmail" placeholder="Email">
-  <input id="loginPass" type="password" placeholder="Senha">
-  <button onclick="loginTecnico()">Entrar</button>
-  <button onclick="showRegister()">Cadastrar Técnico</button>
+<div id="loginDiv">
+<h2>Login Técnico</h2>
+<input type="password" id="senha" placeholder="Senha">
+<button onclick="login()">Entrar</button>
 </div>
 
-<!-- REGISTER -->
-<div class="card hidden" id="registerCard">
-  <h2>🆕 Cadastrar Técnico</h2>
-  <input id="regEmail" placeholder="Email">
-  <input id="regPass" type="password" placeholder="Senha">
-  <button onclick="registerTecnico()">Cadastrar</button>
-  <button class="logout" onclick="backToLogin()">Voltar</button>
+<div id="adminDiv" class="hidden">
+<h2>Painel Técnico</h2>
+<input id="cliente" placeholder="Nome do Cliente">
+<input id="aparelho" placeholder="Descrição do Aparelho">
+<button onclick="addAparelho()">Adicionar Aparelho</button>
+
+<h3>Lista de Aparelhos</h3>
+<div id="lista"></div>
+
+<button onclick="logout()">Sair</button>
 </div>
 
-<!-- ADMIN -->
-<div class="card hidden" id="adminCard">
-  <h3>🔧 Painel Técnico</h3>
-
-  <h4>➕ Cadastrar Cliente & Aparelho</h4>
-  <input id="clienteNome" placeholder="Nome do Cliente">
-  <input id="aparelhoDesc" placeholder="Descrição (modelo/BTUs/local)">
-  <button onclick="addAparelho()">Salvar Aparelho</button>
-
-  <hr>
-
-  <h4>📊 Seus Aparelhos</h4>
-  <div id="listaAparelhos"></div>
-
-  <button class="logout" onclick="logoutTecnico()">Sair</button>
-</div>
-
-<!-- CLIENTE -->
-<div class="card hidden" id="clienteCard">
-  <h3>👤 Histórico do Aparelho</h3>
-  <div id="clienteHistorico"></div>
+<div id="clienteDiv" class="hidden">
+<h2>Histórico do Aparelho</h2>
+<div id="hist"></div>
 </div>
 
 <script>
+const senhaCorreta = "1234";
 
-// ===== FIREBASE CONFIG =====
-// ❗ Substitua pelas suas configurações
-const firebaseConfig = {
-  apiKey: "SEU_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
-};
-// ============================
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// ------------------ LOGIN / REGISTER ------------------
-function showRegister(){
-  document.getElementById("loginCard").classList.add("hidden");
-  document.getElementById("registerCard").classList.remove("hidden");
+// Login
+function login(){
+  const s = document.getElementById("senha").value;
+  if(s===senhaCorreta){
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.remove("hidden");
+    listarAparelhos();
+  } else alert("Senha incorreta");
 }
-function backToLogin(){
-  document.getElementById("registerCard").classList.add("hidden");
-  document.getElementById("loginCard").classList.remove("hidden");
-}
+function logout(){ location.reload(); }
 
-function registerTecnico(){
-  const email = regEmail.value;
-  const pass = regPass.value;
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(()=> alert("Técnico cadastrado com sucesso!"))
-    .catch(e => alert("Erro: "+e.message));
-}
-
-function loginTecnico(){
-  const email = loginEmail.value;
-  const pass = loginPass.value;
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(() => loadAdmin())
-    .catch(e => alert("Erro: "+e.message));
-}
-
-function logoutTecnico(){
-  auth.signOut();
-  location.reload();
-}
-
-// ------------------ ADMIN FUNCTIONS ------------------
-function loadAdmin(){
-  document.getElementById("loginCard").classList.add("hidden");
-  document.getElementById("adminCard").classList.remove("hidden");
+// Adicionar Aparelho
+function addAparelho(){
+  const cliente = document.getElementById("cliente").value;
+  const aparelho = document.getElementById("aparelho").value;
+  if(!cliente || !aparelho) return;
+  const id = "ap"+Date.now();
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  aparelhos.push({id,cliente,aparelho,manutencoes:[]});
+  localStorage.setItem("aparelhos",JSON.stringify(aparelhos));
+  document.getElementById("cliente").value="";
+  document.getElementById("aparelho").value="";
   listarAparelhos();
 }
 
-function addAparelho(){
-  const cliente = clienteNome.value.trim();
-  const desc = aparelhoDesc.value.trim();
-  if(!cliente || !desc) return alert("Preencha tudo!");
-
-  db.collection("aparelhos").add({
-    cliente,
-    desc,
-    criado: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(()=>{
-    clienteNome.value="";
-    aparelhoDesc.value="";
-    listarAparelhos();
+// Listar Aparelhos
+function listarAparelhos(){
+  const lista = document.getElementById("lista");
+  lista.innerHTML="";
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  aparelhos.forEach(a=>{
+    const div = document.createElement("div");
+    div.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}
+    <button onclick="adicionarManut('${a.id}')">Adicionar Manutenção</button>
+    <button onclick="gerarQR('${a.id}')">QR</button>`;
+    lista.appendChild(div);
   });
 }
 
-function listarAparelhos(){
-  listaAparelhos.innerHTML="";
-  db.collection("aparelhos").orderBy("criado", "desc")
-    .get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const id = doc.id;
-        listaAparelhos.innerHTML += `
-          <div class="list">
-            <strong>${d.cliente}</strong><br>${d.desc}<br>
-            <a href="?id=${id}" target="_blank">Ver Como Cliente</a>
-            <button onclick="gerarQR('${id}')">📌 QR</button>
-            <button onclick="excluirAparelho('${id}')">🗑️ Excluir</button>
-          </div>`;
-      });
-    });
+// Adicionar Manutenção
+function adicionarManut(id){
+  const desc = prompt("Descrição da manutenção:");
+  if(!desc) return;
+  const aparelhos = JSON.parse(localStorage.getItem("aparelhos"));
+  const aparelho = aparelhos.find(a=>a.id===id);
+  aparelho.manutencoes.push({data:new Date().toLocaleDateString(),desc});
+  localStorage.setItem("aparelhos",JSON.stringify(aparelhos));
+  listarAparelhos();
 }
 
-function excluirAparelho(id){
-  db.collection("aparelhos").doc(id).delete().then(() => listarAparelhos());
-}
-
+// Gerar QR (mostra link com id)
 function gerarQR(id){
-  const url = `${location.origin}${location.pathname}?id=${id}`;
-  const qr = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(url);
-  window.open(qr, "_blank");
+  alert("QR Link: "+location.href+"?id="+id);
 }
 
-// ------------------ CLIENT VIEW ------------------
+// Cliente (ao abrir página com ?id=)
 window.onload = function(){
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
   if(id){
-    document.getElementById("loginCard").classList.add("hidden");
-    document.getElementById("adminCard").classList.add("hidden");
-    document.getElementById("clienteCard").classList.remove("hidden");
-    listarHistorico(id);
-  }
-};
-
-function listarHistorico(id){
-  clienteHistorico.innerHTML="";
-  db.collection("aparelhos").doc(id)
-    .get().then(doc => {
-      if(!doc.exists) return;
-      const data = doc.data();
-      clienteHistorico.innerHTML += `<strong>${data.cliente}</strong><br>${data.desc}<hr>`;
-      db.collection("aparelhos").doc(id)
-        .collection("manutencoes").orderBy("data", "desc")
-        .get().then(snap => {
-          snap.forEach(m => {
-            const mt = m.data();
-            clienteHistorico.innerHTML += `📅 ${mt.data}<br>${mt.descricao}<br><hr>`;
-          });
-        });
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.add("hidden");
+    document.getElementById("clienteDiv").classList.remove("hidden");
+    const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+    const a = aparelhos.find(x=>x.id===id);
+    if(!a) return;
+    const hist = document.getElementById("hist");
+    hist.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<hr>`;
+    a.manutencoes.forEach(m=>{
+      hist.innerHTML+=`📅 ${m.data}: ${m.desc}<br>`;
     });
+  }
 }
-
-// ------------------ REGISTER MANUTENCAO FROM ADMIN ------------------
-function registrarManut(id){
-  const desc = prompt("Descrição da manutenção:");
-  if(!desc) return;
-  const hoje = new Date().toLocaleDateString();
-  db.collection("aparelhos").doc(id)
-    .collection("manutencoes").add({data:hoje, descricao:desc})
-    .then(()=> alert("Manutenção registrada!"))
-    .then(() => listarAparelhos());
-}
-
 </script>
-
 </body>
 </html>
