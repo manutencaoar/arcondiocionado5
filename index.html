@@ -7,6 +7,7 @@
 body{font-family:Arial;padding:20px;}
 .hidden{display:none;}
 input,button{display:block;margin:10px 0;padding:8px;width:100%;}
+div.aparelho{border:1px solid #ccc;padding:10px;margin:10px 0;}
 </style>
 </head>
 <body>
@@ -50,9 +51,9 @@ function logout(){ location.reload(); }
 
 // Adicionar Aparelho
 function addAparelho(){
-  const cliente = document.getElementById("cliente").value;
-  const aparelho = document.getElementById("aparelho").value;
-  if(!cliente || !aparelho) return;
+  const cliente = document.getElementById("cliente").value.trim();
+  const aparelho = document.getElementById("aparelho").value.trim();
+  if(!cliente || !aparelho){ alert("Preencha todos os campos"); return; }
   const id = "ap"+Date.now();
   const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
   aparelhos.push({id,cliente,aparelho,manutencoes:[]});
@@ -67,11 +68,13 @@ function listarAparelhos(){
   const lista = document.getElementById("lista");
   lista.innerHTML="";
   const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
+  if(aparelhos.length===0){ lista.innerHTML="Nenhum aparelho cadastrado."; return; }
   aparelhos.forEach(a=>{
     const div = document.createElement("div");
-    div.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}
+    div.className = "aparelho";
+    div.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<br>
     <button onclick="adicionarManut('${a.id}')">Adicionar Manutenção</button>
-    <button onclick="gerarQR('${a.id}')">QR</button>`;
+    <button onclick="gerarQR('${a.id}')">Ver Cliente</button>`;
     lista.appendChild(div);
   });
 }
@@ -87,12 +90,12 @@ function adicionarManut(id){
   listarAparelhos();
 }
 
-// Gerar QR (mostra link com id)
+// Gerar QR / link para cliente
 function gerarQR(id){
-  alert("QR Link: "+location.href+"?id="+id);
+  alert("Link para cliente: "+location.origin+location.pathname+"?id="+id);
 }
 
-// Cliente (ao abrir página com ?id=)
+// Cliente (abrir página com ?id=)
 window.onload = function(){
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
@@ -102,9 +105,10 @@ window.onload = function(){
     document.getElementById("clienteDiv").classList.remove("hidden");
     const aparelhos = JSON.parse(localStorage.getItem("aparelhos")||"[]");
     const a = aparelhos.find(x=>x.id===id);
-    if(!a) return;
+    if(!a){ document.getElementById("hist").innerText="Aparelho não encontrado."; return; }
     const hist = document.getElementById("hist");
     hist.innerHTML = `<strong>${a.cliente}</strong> - ${a.aparelho}<hr>`;
+    if(a.manutencoes.length===0){ hist.innerHTML+="Nenhuma manutenção registrada."; return; }
     a.manutencoes.forEach(m=>{
       hist.innerHTML+=`📅 ${m.data}: ${m.desc}<br>`;
     });
